@@ -1,0 +1,10 @@
+
+
+project_root: /var/www/dashapp
+
+server_name: rgc1
+
+service_user: nobody
+service_group: nogroup
+service_workers: 5
+

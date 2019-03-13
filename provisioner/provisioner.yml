@@ -1,0 +1,153 @@
+#!/usr/bin/env ansible-playbook
+# 
+# Requirements:
+#
+# ```
+# sudo apt install python3 python3-pip
+# pip3 install pipenv
+# pipenv install
+# ```
+# 
+# Usage: 
+# 
+# ```
+# ./provisioner.yml -K
+# ```
+
+
+- hosts: localhost
+  become: true
+
+  vars_files:
+    - vars/main.yml
+
+  handlers:
+      - name: restart gunicorn
+        systemd:
+          name: gunicorn.socket
+          state: restarted
+
+      - name: restart nginx
+        systemd:
+          name: nginx
+          state: restarted
+        notify: restart gunicorn
+
+  tasks:
+
+    ########## Install and Configure Nginx ##########
+    # http://nginx.org/en/docs/
+
+    - name: Install packages
+      raw: sudo apt-get -y update && sudo apt-get -y install nginx
+
+    - name: Enable nginx to start at boot
+      systemd: name=nginx state=started enabled=yes
+
+
+    ########## Install the Application ##########
+
+    - name: Install pipenv
+      pip:
+        name: pipenv
+
+    - name: Create an application directory
+      file: 
+        path: "{{ project_root }}"
+        state: directory
+        owner: "{{ service_user }}"
+        group: "{{ service_group }}"
+
+    - name: Copy the application files into the app directory
+      copy:
+        src: ../app/
+        dest: "{{ project_root }}"
+        owner: "{{ service_user }}"
+        group: "{{ service_group }}"
+
+    # - name: Checkout the git repo to the project directory
+    #   git:
+    #     repo: https://github.com/jonahlyn/dashboard.git
+    #     dest: "{{ project_root }}"
+    #     update: no
+    #     accept_hostkey: true
+
+    - name: Check if a virtualenv is already created
+      environment:
+        PIPENV_VENV_IN_PROJECT: true
+      ignore_errors: true
+      command: "pipenv --venv"
+      args:
+        chdir: "{{ project_root }}"
+      register: pipenv_venv_check_cmd
+      changed_when:
+        - ('No virtualenv' not in pipenv_venv_check_cmd.stderr)
+
+    - name: Run a pipenv install
+      environment:
+        PIPENV_VENV_IN_PROJECT: true
+      command: "pipenv --bare install"
+      args:
+        chdir: "{{ project_root }}"
+      when:
+        - ('No virtualenv' in pipenv_venv_check_cmd.stderr)
+
+
+    ########## Configure Nginx ##########
+    # http://docs.gunicorn.org/en/latest/deploy.html
+
+    - name: Copy new nginx configuration into place
+      template:
+        src: templates/nginx/nginx.conf.j2
+        dest: /etc/nginx/nginx.conf
+        backup: yes
+
+    - name: Disable default nginx site
+      file:
+        name: /etc/nginx/sites-enabled/default
+        state: absent
+
+    - name: Copy a simple dashapp configuration in place
+      template:
+        src: templates/nginx/dashapp.config.j2
+        dest: /etc/nginx/sites-available/dashapp.config
+        backup: yes
+
+    - name: Copy complex dashapp configuration into place
+      template:
+        src: templates/nginx/dashapp-gunicorn.config.j2
+        dest: /etc/nginx/sites-available/dashapp-gunicorn.config
+        backup: yes
+
+    - name: Enable the new configuration by creating symlink
+      file:
+        src: /etc/nginx/sites-available/dashapp-gunicorn.config
+        dest: /etc/nginx/sites-enabled/dashapp-gunicorn.config
+        state: link
+      notify: restart nginx
+
+
+    ########## Configure Gunicorn Service ##########
+    # http://docs.gunicorn.org/en/latest/deploy.html
+    # https://simpleit.rocks/python/django/set-up-ubuntu-to-serve-a-django-website-step-by-step/
+
+    - name: Configure the gunicorn systemd service
+      template:
+        src: templates/systemd/gunicorn.service.j2
+        dest: /etc/systemd/system/gunicorn.service
+
+    - name: Configure the gunicorn socket
+      template:
+        src: templates/systemd/gunicorn.socket.j2
+        dest: /etc/systemd/system/gunicorn.socket
+
+    - name: Configure the gunicorn temporal file
+      template:
+        src: templates/systemd/gunicorn.conf.j2
+        dest: /etc/tmpfiles.d/gunicorn.conf
+
+    - name: Start gunicorn service and enable at boot
+      systemd: 
+        name: gunicorn.socket
+        state: started
+        enabled: yes

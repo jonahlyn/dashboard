@@ -1,0 +1,21 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+pylint = "*"
+matplotlib = "*"
+jupyter = "*"
+tornado = "==4.5.3"
+
+[packages]
+dash = "==0.38.0"
+dash-html-components = "==0.13.5"
+dash-core-components = "==0.43.1"
+dash-daq = "==0.1.0"
+gunicorn = "*"
+pandas = "*"
+
+[requires]
+python_version = "3.6"
