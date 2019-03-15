@@ -8,3 +8,10 @@ service_user: nobody
 service_group: nogroup
 service_workers: 5
 
+open_ports:
+  - 80
+  - 443
+
+closed_ports: 
+  - 3306
+
