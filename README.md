@@ -10,7 +10,7 @@ Requirements:
 
 ```
 sudo apt install python python-pip python3 python3-pip
-pip3 install pipenv
+sudo pip3 install pipenv --system
 ```
 
 ## Installation
@@ -23,19 +23,35 @@ git clone https://github.com/jonahlyn/dashboard.git
 cd dashboard
 ```
 
-## Production Deployment
+## Production Deployment with Ansible
 
-Configure the server and deploy the application with ansible:
+The following steps will install Nginx, MariaDB and deploy the code in the `app` directory.
+
+1. Go into the provisioner directory and execute the following to install the provisioner dependencies:
 
 ```
 cd provisioner
 pipenv install
 pipenv shell
+```
+
+2. Edit the `vars/main.yml` file and update the `server_name` variable with the host name of the server:
+
+```
+server_name: rgc1
+```
+
+3. Execute the ansible playbook. When prompted, type in the user's sudo password. 
+
+```
 ./provisioner.yml -K
 ```
 
-When prompted, type in the user's sudo password. 
-When provisioning is complete, the application will be running on port 80 and accessible over a web browser.
+When provisioning is complete, the application will be running on port 80.
+
+Example: http://rgc1
+
+
 
 ## Troubleshooting
 
