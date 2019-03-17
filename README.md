@@ -9,7 +9,7 @@ Requirements:
 - Python 2 and 3
 
 ```
-sudo apt install python python-pip python3 python3-pip
+sudo apt -y install python python-pip python3 python3-pip
 sudo pip3 install pipenv --system
 ```
 
