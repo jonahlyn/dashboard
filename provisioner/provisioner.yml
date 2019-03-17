@@ -5,6 +5,8 @@
 # Usage: 
 # 
 # ```
+# pipenv install
+# pipenv shell
 # ./provisioner.yml -K
 # ```
 
@@ -64,10 +66,6 @@
     # todo
 
     ########## Install the Application ##########
-
-    - name: Install pipenv
-      pip:
-        name: pipenv
 
     - name: Create an application directory
       file: 
