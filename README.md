@@ -13,6 +13,14 @@ sudo apt -y install python python-pip python3 python3-pip
 sudo pip3 install pipenv --system
 ```
 
+Python can be weird, so if that doesn't work try this:
+
+```
+sudo -H python3 -m pip install pipenv
+```
+
+Either way, you need to end up with `/usr/local/bin/pipenv`.
+
 ## Installation
 
 1. Login with a user with sudo privileges.
@@ -32,7 +40,6 @@ The following steps will install Nginx, MariaDB and deploy the code in the `app`
 ```
 cd provisioner
 pipenv install
-pipenv shell
 ```
 
 2. Edit the `vars/main.yml` file and update the `server_name` variable with the host name of the server:
@@ -44,6 +51,7 @@ server_name: rgc1
 3. Execute the ansible playbook. When prompted, type in the user's sudo password. 
 
 ```
+pipenv shell
 ./provisioner.yml -K
 ```
 
