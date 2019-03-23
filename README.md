@@ -9,8 +9,8 @@ Requirements:
 - Python 2 and 3
 
 ```
-sudo apt -y install python python-pip python3 python3-pip
-sudo pip3 install pipenv --system
+sudo apt update && sudo apt -y install python python-pip python3 python3-pip
+sudo -H pip3 install pipenv --system
 ```
 
 Python can be weird, so if that doesn't work try this:
@@ -52,7 +52,7 @@ server_name: rgc1
 
 ```
 pipenv shell
-./provisioner.yml -K
+ansible-playbook provisioner.yml -K
 ```
 
 When provisioning is complete, the application will be running on port 80.

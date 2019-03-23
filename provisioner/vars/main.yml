@@ -1,13 +1,21 @@
 
-
+# Web app settings
 project_root: /var/www/dashapp
 
 server_name: rgc1
 
+# Web server configuraiton
 service_user: nobody
 service_group: nogroup
 service_workers: 5
 
+# Database settings
+mysql_root_pass: "PASSWORD"
+db_name: "usagedb"
+db_user: "roadwayuser"
+db_pass: "PASSWORD"
+
+# Firewall configuration
 open_ports:
   - 80
   - 443

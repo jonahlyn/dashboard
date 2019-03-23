@@ -1,11 +1,11 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "087ab7190e54ed6ad4967da579c7b45ea234669d34c15decb8f5f25e70b776d7"
+            "sha256": "a7c99bcaca8bf71068c34078254230c5b652f2c90fc7872875b9365ac7eee90e"
         },
         "pipfile-spec": 6,
         "requires": {
-            "python_version": "3.5"
+            "python_version": "3.6"
         },
         "sources": [
             {
@@ -250,10 +250,10 @@
         },
         "plotly": {
             "hashes": [
-                "sha256:0d85289494a6da90b16a5c4be87a38b58491a823a19d40b7e5ab28f68d71f860",
-                "sha256:a891661fdc343819abcbd1660ba67d5a8741616274569c34d2e36c003ba1b9f6"
+                "sha256:3688585fbde025ebbc820c9c5bc9eaf8cc64f47f3071f62c686bc470bf8db7b9",
+                "sha256:ac353e6b01892b016f77edb599f03198b9e1401dc07f2f66dddf940b18004dbd"
             ],
-            "version": "==3.7.0"
+            "version": "==3.7.1"
         },
         "pyrsistent": {
             "hashes": [
@@ -311,10 +311,10 @@
         },
         "werkzeug": {
             "hashes": [
-                "sha256:c3fd7a7d41976d9f44db327260e263132466836cef6f91512889ed60ad26557c",
-                "sha256:d5da73735293558eb1651ee2fddc4d0dedcfa06538b8813a2e20011583c9e49b"
+                "sha256:590abe38f8be026d78457fe3b5200895b3543e58ac3fc1dd792c6333ea11af64",
+                "sha256:ee11b0f0640c56fb491b43b38356c4b588b3202b415a1e03eacf1c5561c961cf"
             ],
-            "version": "==0.14.1"
+            "version": "==0.15.0"
         }
     },
     "develop": {

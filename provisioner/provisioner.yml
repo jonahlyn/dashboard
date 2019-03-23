@@ -17,6 +17,15 @@
   vars_files:
     - vars/main.yml
 
+  pre_tasks:
+    - name: Update apt cache
+      apt: 
+        update_cache: yes
+
+  roles:
+    - mariadb
+    # - { role: mysql, db_name: "{{ db_name}}", db_user: "{{ db_user }}", db_pass: "{{ db_pass }}" }
+
   handlers:
       - name: restart gunicorn
         systemd:
@@ -34,28 +43,23 @@
     ########## Install and Configure Dependencies ##########
     # http://nginx.org/en/docs/
 
-    - name: Install packages
-      raw: sudo apt-get -y update && sudo apt-get -y install firewalld nginx mariadb-server
+    # - name: Install packages
+    #   raw: sudo apt-get -y install firewalld nginx
 
     # 3/14/2019 - cannot install packages with apt under Python3
-    # - name: Install packages
-    #   apt:
-    #     name: "{{ packages }}"
-    #   vars:
-    #     packages:
-    #     - firewalld
-    #     - nginx
-    #     - mariadb-server
+    - name: Install packages
+      apt:
+        name: "{{ packages }}"
+      vars:
+        packages:
+        - firewalld
+        - nginx
 
     - name: Enable nginx to start at boot
       systemd:
         name: nginx
         state: started
         enabled: yes
-
-    ########## Create the database ##########
-
-    # todo
 
     ########## Install and configure firewall ##########
 
@@ -110,23 +114,27 @@
         src: templates/nginx/nginx.conf.j2
         dest: /etc/nginx/nginx.conf
         backup: yes
+      notify: restart nginx
 
     - name: Disable default nginx site
       file:
         name: /etc/nginx/sites-enabled/default
         state: absent
+      notify: restart nginx
 
     - name: Copy a simple dashapp configuration in place
       template:
         src: templates/nginx/dashapp.config.j2
         dest: /etc/nginx/sites-available/dashapp.config
         backup: yes
+      notify: restart nginx
 
     - name: Copy complex dashapp configuration into place
       template:
         src: templates/nginx/dashapp-gunicorn.config.j2
         dest: /etc/nginx/sites-available/dashapp-gunicorn.config
         backup: yes
+      notify: restart nginx
 
     - name: Enable the new configuration by creating symlink
       file:
