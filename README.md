@@ -53,7 +53,7 @@ server_name: rgc1
 Make sure it has the right permissions.
 
 ```
-chmod 700 vars/.vault_pass.txt
+chmod 600 vars/.vault_pass.txt
 ```
 
 5. Execute the ansible playbook. When prompted, type in the user's sudo password. 
@@ -98,7 +98,7 @@ A user with sudo privileges can make a connection to the database using the mysq
 
 ### Changing Passwords
 
-1. Change the vault password in `.vault_pass.txt`
+1. Change the vault password in `provisioner/vars/.vault_pass.txt`
 2. Execute `ansible-vault encrypt_string`.
 3. Enter a new password string followed by `control+d`.
 3. Copy and paste the encrypted string into `provisioner/vars/main.yml`.
