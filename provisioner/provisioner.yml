@@ -152,16 +152,19 @@
       template:
         src: templates/systemd/gunicorn.service.j2
         dest: /etc/systemd/system/gunicorn.service
+      notify: restart gunicorn
 
     - name: Configure the gunicorn socket
       template:
         src: templates/systemd/gunicorn.socket.j2
         dest: /etc/systemd/system/gunicorn.socket
+      notify: restart gunicorn
 
     - name: Configure the gunicorn temporal file
       template:
         src: templates/systemd/gunicorn.conf.j2
         dest: /etc/tmpfiles.d/gunicorn.conf
+      notify: restart gunicorn
 
     - name: Start gunicorn service and enable at boot
       systemd: 
