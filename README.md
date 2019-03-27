@@ -7,6 +7,9 @@ Requirements:
 - Operating system: Ubuntu 16.04
 - User account with sudo privileges
 - Python 2 and 3
+- Git
+
+Login with a user with sudo privileges and execute the following to install python dependencies:
 
 ```
 sudo apt update && sudo apt -y install python python-pip python3 python3-pip
@@ -21,34 +24,39 @@ sudo -H python3 -m pip install pipenv
 
 Either way, you need to end up with `/usr/local/bin/pipenv`.
 
-## Installation
+## Installation and Deployment with Ansible
 
-1. Login with a user with sudo privileges.
-2. In the users home directory, clone this repository and go into the directory.
+The following steps will install Nginx, MariaDB and deploy the code in the `app` directory.
+
+1. In the users home directory, clone this repository and go into the directory.
 
 ```
 git clone https://github.com/jonahlyn/dashboard.git
 cd dashboard
 ```
 
-## Production Deployment with Ansible
-
-The following steps will install Nginx, MariaDB and deploy the code in the `app` directory.
-
-1. Go into the provisioner directory and execute the following to install the provisioner dependencies:
+2. Go into the provisioner directory and execute the following to install the provisioner dependencies:
 
 ```
 cd provisioner
 pipenv install
 ```
 
-2. Edit the `vars/main.yml` file and update the `server_name` variable with the host name of the server:
+3. Edit the `vars/main.yml` file and update the `server_name` variable with the fully qualified domain name of the server (or the IP address):
 
 ```
 server_name: rgc1
 ```
 
-3. Execute the ansible playbook. When prompted, type in the user's sudo password. 
+4. Create the file `provisioner/vars/.vault_pass.txt` and add the vault password to it. (See also ["Changing Passwords"](#changing-passwords) in the troubleshooting section below.)
+
+Make sure it has the right permissions.
+
+```
+chmod 700 vars/.vault_pass.txt
+```
+
+5. Execute the ansible playbook. When prompted, type in the user's sudo password. 
 
 ```
 pipenv shell
@@ -61,18 +69,39 @@ Example: http://rgc1
 
 
 
-## Troubleshooting
+## Troubleshooting and Maintenance
 
-Check the status of nginx and the gunicorn application services:
+### Services
+
+Start, stop, or check the status of nginx and the gunicorn application services:
 
 ```
-sudo systemctl status nginx
-sudo systemctl status gunicorn.socket
+sudo systemctl [start|stop|status] nginx
+sudo systemctl [start|stop|status] gunicorn.socket
 ```
+
+
+### Application
 
 Log files are located at:
   - access_log: `/var/log/nginx/access.log`
   - error_log: `/var/log/nginx/error.log`
+
+
+### Database
+
+A user with sudo privileges can make a connection to the database using the mysql cli. Note: credentials can be found in `/root/.my.cnf`
+
+1. Type `sudo su -` and enter the user's password.
+2. Connect to mysql using the cli: `mysql -u root`
+
+
+### Changing Passwords
+
+1. Change the vault password in `.vault_pass.txt`
+2. Execute `ansible-vault encrypt_string`.
+3. Enter a new password string followed by `control+d`.
+3. Copy and paste the encrypted string into `provisioner/vars/main.yml`.
 
 
 ## Development Server
@@ -94,10 +123,5 @@ pipenv run gunicorn -w 5 app:server
 ```
 
 Open http://localhost:8000
-
-
-
-
-
 
 
