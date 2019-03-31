@@ -4,7 +4,7 @@
 ## Getting Started
 
 Requirements:
-- Operating system: Ubuntu 16.04
+- Operating system: Ubuntu 18.04
 - User account with sudo privileges
 - Python 2 and 3
 - Git
