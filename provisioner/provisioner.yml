@@ -54,6 +54,7 @@
         packages:
         - firewalld
         - nginx
+        - ffmpeg
 
     - name: Enable nginx to start at boot
       systemd:

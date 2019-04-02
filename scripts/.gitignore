@@ -1,0 +1,3 @@
+mask.rcnn.coco.h5
+data/*.png
+logs
