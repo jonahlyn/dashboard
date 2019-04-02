@@ -68,6 +68,13 @@ When provisioning is complete, the application will be running on port 80.
 Example: http://rgc1
 
 
+6. To allow external connection, open the port on the firewall.
+
+```
+sudo firewall-cmd --zone=public --permanent --add-service=http
+sudo firewall-cmd --reload
+```
+
 
 ## Troubleshooting and Maintenance
 
