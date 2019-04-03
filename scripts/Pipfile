@@ -20,6 +20,7 @@ ipython = {extras = ["all"],version = "*"}
 Pillow = "*"
 Cython = "*"
 Keras = ">=2.0.8"
+mysql-connector-python = "*"
 
 [requires]
 python_version = "3.6"
