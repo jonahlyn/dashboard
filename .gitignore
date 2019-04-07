@@ -1,3 +1,4 @@
 .Trash-1000
 .vscode
 .DS_Store
+__pycache__
