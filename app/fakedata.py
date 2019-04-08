@@ -25,7 +25,7 @@ def get_data(start, end, f='5T'):
 
 if __name__ == "__main__":
     # Generate fake data for 31 days at 5 minute intervals (288 five minute intervals per day)
-    fake_data = get_data('2019-01-01T00:00:00Z', '2019-02-01T00:00:00Z')
+    fake_data = get_data('2019-01-01T00:00:00Z', '2019-04-01T00:00:00Z')
 
     # Get the average over each Interval
     fdbyint = fake_data.groupby('Interval').agg({'Total': np.average})

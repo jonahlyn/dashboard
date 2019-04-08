@@ -16,6 +16,8 @@ dash-core-components = "==0.43.1"
 dash-daq = "==0.1.0"
 gunicorn = "*"
 pandas = "*"
+mysql-connector-python = "*"
+sqlalchemy = "*"
 
 [requires]
 python_version = "3.6"

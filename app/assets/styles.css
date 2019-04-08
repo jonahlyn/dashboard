@@ -23,18 +23,25 @@ body {
 
 .container {
     position: relative;
-    background-color: white;
-    border-radius: 2px 2px 5px 5px;
     font-size: 1.5rem;
-    border: thin solid rgb(240, 240, 240);
     margin-left: auto;
     margin-right: auto;
-    color: #302F54;
-    padding: 10px;
     width: 95%;
     max-width: none;
     box-sizing: border-box;
-  }
+}
+
+.row {
+    margin-bottom: 10px;
+}
+
+.columns {
+    background-color: white;
+    border-radius: 2px 2px 5px 5px;
+    border: thin solid rgb(240, 240, 240);
+    color: #302F54;
+    padding: 10px;
+}
 
 #main-graph {
     margin: 20px 0;
