@@ -84,7 +84,14 @@ Start, stop, or check the status of nginx and the gunicorn system services:
 
 ```
 sudo systemctl [start|stop|status] nginx
+sudo systemctl [start|stop|status] gunicorn
 sudo systemctl [start|stop|status] gunicorn.socket
+```
+
+Error messages can also appear here:
+
+```
+sudo journalctl -u gunicorn
 ```
 
 
@@ -93,6 +100,8 @@ sudo systemctl [start|stop|status] gunicorn.socket
 Log files are located at:
   - access_log: `/var/log/nginx/access.log`
   - error_log: `/var/log/nginx/error.log`
+
+Application log files are located in: `/var/www/dashapp/logs`
 
 
 ### Database
@@ -118,22 +127,37 @@ For each password in `main.yml`:
 
 ## Development Server
 
+To install a development environment:
+
+```
+cd app
+pipenv install
+pipenv shell
+```
+
+
+Create a configuration file `app/config.py` with the following contents:
+
+```
+USER = '<username>'
+PASSWORD = '<userpassword>'
+HOST = 'localhost'
+PORT = '3306'
+DB = '<databasename>'
+DATABASE_URI = 'mysql+mysqlconnector://{}:{}@{}:{}/{}'.format(USER, PASSWORD, HOST, PORT, DB)
+```
+
+
 To run the dashboard in a temporary development server, run:
 
 ```
-cd app
-pipenv install
-pipenv run python app.py
+APPLICATION_CONFIG=config.py python app.py
 ```
 
-Or, run the app manually with gunicorn on port 8000:
+
+Or, run the app manually with gunicorn:
 
 ```
-cd app
-pipenv install
-pipenv run gunicorn -w 5 app:server
+APPLICATION_CONFIG=config.py gunicorn app:server
 ```
-
-Open http://localhost:8000
-
 

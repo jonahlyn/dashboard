@@ -9,7 +9,10 @@ User={{ service_user }}
 Group={{ service_group }}
 RuntimeDirectory=gunicorn
 WorkingDirectory={{ project_root }}
-ExecStart={{ project_root }}/.venv/bin/gunicorn --pid /run/gunicorn/pid   \
+ExecStart={{ project_root }}/.venv/bin/gunicorn --pid /run/gunicorn/pid \
+          --access-logfile {{ project_root }}/logs/dash.access.log \
+          --error-logfile {{ project_root }}/logs/dash.error.log \
+          --env APPLICATION_CONFIG=config.py \
           --bind unix:/run/gunicorn/socket -w {{ service_workers }} app:server
 ExecReload=/bin/kill -s HUP $MAINPID
 ExecStop=/bin/kill -s TERM $MAINPID
