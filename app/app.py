@@ -43,7 +43,10 @@ app.index_string = '''
 conn = create_engine(server.config['DATABASE_URI'], echo=False)
 
 # Get the min and max range of dates
-dates_df = pd.read_sql('select min(date) as start, max(date) as end from data', conn)
+try:
+    dates_df = pd.read_sql('select min(date) as start, max(date) as end from data', conn)
+except:
+    dates_df = pd.DataFrame(pd.DataFrame({'start': [pd.to_datetime(dt.today())], 'end':[pd.to_datetime(dt.today() - timedelta(days=90))]}))
 
 
 DAYS_OF_WEEK = {
@@ -55,6 +58,19 @@ DAYS_OF_WEEK = {
     5: 'Saturday',
     6: 'Sunday'
 }
+
+
+def get_graph_config():
+    """
+        Configure Graph Buttons
+    """
+    return {'displayModeBar': False,
+     'displaylogo': False,
+     'modeBarButtonsToRemove': ['sendDataToCloud', 
+        'zoom2d','pan2d','select2d','lasso2d',
+        'zoomIn2d','zoomOut2d','autoScale2d',
+        'resetScale2d','hoverClosestCartesian',
+        'hoverCompareCartesian','toggleSpikelines']}
 
 
 #####################################
@@ -98,19 +114,13 @@ app.layout = html.Div(children=[
                 ),
 
                 # Traffic explorer graph
-                dcc.Graph( id='exp-graph', 
-                        #    figure={
-                        #     'data': [],
-                        #     'layout': {}
-                        #     },
-                        #    config={} 
-                        ),
+                dcc.Graph( id='exp-graph', config=get_graph_config()),
             ]),
 
             # Image
             html.Div(className="five columns", children=[
                 html.Img( id="img",
-                          src='/assets/images/image.png', 
+                          src='/assets/image.png', 
                           style={'maxWidth': '100%'})
             ])
         ]), # End image viewer row
@@ -143,21 +153,7 @@ app.layout = html.Div(children=[
 
             html.Div(className="seven columns", children=[
                 # Daily average graph
-                dcc.Graph( id='avg-graph', 
-                        #    figure={
-                        #     'data': [],
-                        #     'layout': get_graph_layout()
-                        #     },
-                           config={
-                                'displayModeBar': False,
-                                'displaylogo': False,
-                                'modeBarButtonsToRemove': ['sendDataToCloud', 
-                                    'zoom2d','pan2d','select2d','lasso2d',
-                                    'zoomIn2d','zoomOut2d','autoScale2d',
-                                    'resetScale2d','hoverClosestCartesian',
-                                    'hoverCompareCartesian','toggleSpikelines']
-                            } 
-                        ),
+                dcc.Graph( id='avg-graph', config=get_graph_config()),
             ]),
         ]) # End daily average row
 
@@ -169,13 +165,15 @@ app.layout = html.Div(children=[
 ####################################
 ########## Explorer Graph ##########
 ####################################
+
+# Update image when exp-graph is clicked
 @app.callback(Output("img", "src"),
              [Input("exp-graph", "clickData")])
 def update_image(click_data):
     try:
         src = '/assets/images/{}'.format(click_data['points'][0]['text'])
     except:
-        src='http://placehold.it/800x450'
+        src='/assets/image.png'
     
     return src
 
@@ -186,15 +184,17 @@ def update_image(click_data):
     [Input(component_id='date-select', component_property='date')]
 )
 def update_exp_graph(selected_date):
+    figure = None
 
-    start_date = selected_date
-    end_date = dt.strptime(selected_date, "%Y-%m-%d") + timedelta(days=1)
+    try:
+        start_date = selected_date
+        end_date = dt.strptime(selected_date, "%Y-%m-%d") + timedelta(days=1)
 
-    # Query the database
-    query = "SELECT date, vehicles, filename FROM data where date between '{}' and '{}'".format(start_date, end_date)
-    df = pd.read_sql(query, conn)
+        # Query the database
+        query = "SELECT date, vehicles, filename FROM data where date between '{}' and '{}'".format(start_date, end_date)
+        df = pd.read_sql(query, conn)
 
-    return {
+        figure = {
             'data': [go.Scatter(
                     x = df['date'],
                     y = df['vehicles'],
@@ -217,6 +217,10 @@ def update_exp_graph(selected_date):
                     },
                 }
             }
+    except:
+        pass
+
+    return figure
 
 
 #########################################
@@ -261,47 +265,54 @@ def get_graph_layout(title = ""):
      Input(component_id='day-select', component_property='value')]
 )
 def update_avg_graph(start_date, end_date, selected_days):
-
     if start_date is not None and end_date is not None:
-        # Query the database
-        query = "SELECT date, vehicles FROM data where date between '{}' and '{}'".format(start_date, end_date)
-        df = pd.read_sql(query, conn)
-        df['interval'] = df['date'].dt.strftime('%H%M').astype('int64')
+        figure = None
 
-        traces = []
+        try: 
+            # Query the database
+            query = "SELECT date, vehicles FROM data where date between '{}' and '{}'".format(start_date, end_date)
+            df = pd.read_sql(query, conn)
+            df['interval'] = df['date'].dt.strftime('%H%M').astype('int64')
 
-        if not selected_days:
-            # If no day is selected (selected_days is None or []), 
-            # show average of all data
-            dff = df.groupby('interval', as_index = False).agg({'vehicles': np.average})
-            traces.append(go.Scatter(
-                    x=dff['interval'],
-                    y=dff['vehicles'],
-                    mode='lines',
-                    # hoverinfo = 'text',
-                    # text = dff.apply(get_hover_text, axis=1),
-                    # fill='tonexty',
-                    # fill='tozeroy'
-                ))
-        else:
-            # If day is selected, show average of selected day
-            for day in selected_days:
-                tmp = df[df.date.dt.dayofweek == int(day)].groupby('interval', as_index = False).agg({'vehicles': np.average})
+            traces = []
+
+            if not selected_days:
+                # If no day is selected (selected_days is None or []), 
+                # show average of all data
+                dff = df.groupby('interval', as_index = False).agg({'vehicles': np.average})
                 traces.append(go.Scatter(
-                    x=tmp['interval'],
-                    y=tmp['vehicles'],
-                    mode='lines',
-                    # hoverinfo = 'text',
-                    # text = tmp.apply(get_hover_text, axis=1),
-                    # fill='tonexty',
-                    # fill='tozeroy'
-                    name=DAYS_OF_WEEK[day]
-                ))
+                        x=dff['interval'],
+                        y=dff['vehicles'],
+                        mode='lines',
+                        # hoverinfo = 'text',
+                        # text = dff.apply(get_hover_text, axis=1),
+                        # fill='tonexty',
+                        # fill='tozeroy'
+                    ))
+            else:
+                # If day is selected, show average of selected day
+                for day in selected_days:
+                    tmp = df[df.date.dt.dayofweek == int(day)].groupby('interval', as_index = False).agg({'vehicles': np.average})
+                    traces.append(go.Scatter(
+                        x=tmp['interval'],
+                        y=tmp['vehicles'],
+                        mode='lines',
+                        # hoverinfo = 'text',
+                        # text = tmp.apply(get_hover_text, axis=1),
+                        # fill='tonexty',
+                        # fill='tozeroy'
+                        name=DAYS_OF_WEEK[day]
+                    ))
 
-        return {
-            'data': traces,
-            'layout': get_graph_layout("Average Daily Traffic")
+            figure = {
+                'data': traces,
+                'layout': get_graph_layout("Average Daily Traffic")
             }
+
+        except:
+            pass
+
+        return figure
 
 
 if __name__ == '__main__':
