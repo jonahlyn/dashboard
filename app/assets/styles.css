@@ -35,3 +35,7 @@ body {
     max-width: none;
     box-sizing: border-box;
   }
+
+#main-graph {
+    margin: 20px 0;
+}

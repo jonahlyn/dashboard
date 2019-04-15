@@ -61,9 +61,10 @@
         state: started
         enabled: yes
 
-    ########## Install and configure firewall ##########
+    ########## Configure firewall ##########
 
-    # todo
+    # 4/1/2019 Encountered issues configuring firewalld
+    # https://github.com/ansible/ansible/issues/24855
 
     ########## Configure HTTPS ##########
 

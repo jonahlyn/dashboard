@@ -68,12 +68,19 @@ When provisioning is complete, the application will be running on port 80.
 Example: http://rgc1
 
 
+6. To allow external connection, open the port on the firewall.
+
+```
+sudo firewall-cmd --zone=public --permanent --add-service=http
+sudo firewall-cmd --reload
+```
+
 
 ## Troubleshooting and Maintenance
 
 ### Services
 
-Start, stop, or check the status of nginx and the gunicorn application services:
+Start, stop, or check the status of nginx and the gunicorn system services:
 
 ```
 sudo systemctl [start|stop|status] nginx
@@ -99,6 +106,9 @@ A user with sudo privileges can make a connection to the database using the mysq
 ### Changing Passwords
 
 1. Change the vault password in `vars/.vault_pass.txt`
+
+For each password in `main.yml`:
+
 2. Execute `ansible-vault encrypt_string`. You should prompted with the message `Reading plaintext input from stdin.`
 3. Enter a new password string followed by `enter` and then `control+d`.
 3. Copy and paste the encrypted string into `provisioner/vars/main.yml`.
@@ -119,7 +129,7 @@ To run the dashboard in a temporary development server, run:
 ```
 cd app
 pipenv install
-pipenv shell python app.py
+pipenv run python app.py
 ```
 
 Or, run the app manually with gunicorn on port 8000:
