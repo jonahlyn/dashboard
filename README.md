@@ -98,10 +98,18 @@ A user with sudo privileges can make a connection to the database using the mysq
 
 ### Changing Passwords
 
-1. Change the vault password in `provisioner/vars/.vault_pass.txt`
-2. Execute `ansible-vault encrypt_string`.
-3. Enter a new password string followed by `control+d`.
+1. Change the vault password in `vars/.vault_pass.txt`
+2. Execute `ansible-vault encrypt_string`. You should prompted with the message `Reading plaintext input from stdin.`
+3. Enter a new password string followed by `enter` and then `control+d`.
 3. Copy and paste the encrypted string into `provisioner/vars/main.yml`.
+
+Note: If you are prompted for the vault password, something is wrong. Please check the following:
+
+- Make sure you are inside the `provisioner` directory.
+- Check that the `vars/.vault_pass.txt` exists and contains the vault password.
+- Make sure the `provisioner` directory and its contents are not world writable.
+- Make sure the `vars/.vault_pass.txt` is not executable.
+
 
 
 ## Development Server
