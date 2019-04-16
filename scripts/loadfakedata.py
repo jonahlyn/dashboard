@@ -11,9 +11,11 @@ import pandas as pd
 import numpy as np
 import mysql.connector
 from sqlalchemy import create_engine
+import os
+from itertools import islice, cycle
 
 # Load configuration
-from config import DATABASE_URI
+from config import DATABASE_URI, IMG_PATH
 
 np.random.seed(345354)
 
@@ -21,11 +23,12 @@ np.random.seed(345354)
 def get_data(start, end, f='5T'):
     """Generate fake data between start and dates"""
     date_list = pd.to_datetime(pd.date_range(start, end, freq=f))
+    file_list = sorted(os.listdir(IMG_PATH))
 
     data = pd.DataFrame({
         'date': date_list,
         'vehicles': [(5 + np.random.randint(-5, 10)) for x in date_list],
-        'filename': "output_20190402201820.png"
+        'filename': pd.Series(list(islice(cycle(file_list), date_list.size)))
         }
     )
 
