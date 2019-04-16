@@ -120,6 +120,14 @@
         dest: "{{ project_root }}/config.py"
         backup: yes
 
+    - name: Create a web-accessible symlink to the images directory
+      file:
+        src: "{{ images_path }}"
+        dest: "{{ project_root }}/assets/images"
+        owner: "{{ service_user }}"
+        group: "{{ service_group }}"
+        state: link
+
     ########## Configure Nginx ##########
     # http://docs.gunicorn.org/en/latest/deploy.html
 
