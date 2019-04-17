@@ -118,7 +118,16 @@
       template:
         src: templates/app/config.py
         dest: "{{ project_root }}/config.py"
+        owner: "{{ service_user }}"
+        group: "{{ service_group }}"
+        mode: u=r,g=r,o=r
         backup: yes
+
+    - name: Create images directory if needed
+      file:
+        path: "{{ images_path }}"
+        mode: 0755
+        state: directory
 
     - name: Create a web-accessible symlink to the images directory
       file:
