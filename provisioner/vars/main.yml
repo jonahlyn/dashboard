@@ -4,7 +4,9 @@ project_root: /var/www/dashapp
 
 server_name: rgc.nmsu.edu
 
-# Web server configuraiton
+images_path: /var/www/images
+
+# Web server configuration
 service_user: nobody
 service_group: nogroup
 service_workers: 5
@@ -17,6 +19,8 @@ mysql_root_pass: !vault |
           34656534616133323061646436666133643539393037346536336232383538383139316338353138
           6432346333373165650a316465353566633937343737386638376239343561326336646430666164
           6631
+db_host: "localhost"
+db_port: "3306"
 db_name: "appdb"
 db_user: "appuser"
 db_pass: !vault |

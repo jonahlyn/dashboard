@@ -27,16 +27,24 @@
     # - { role: mysql, db_name: "{{ db_name}}", db_user: "{{ db_user }}", db_pass: "{{ db_pass }}" }
 
   handlers:
-      - name: restart gunicorn
+      - name: restart gunicorn socket
         systemd:
           name: gunicorn.socket
           state: restarted
+          daemon_reload: yes
+        notify: restart gunicorn service
+
+      - name: restart gunicorn service
+        systemd:
+          name: gunicorn
+          state: restarted
+          daemon_reload: yes
+        notify: restart nginx
 
       - name: restart nginx
         systemd:
           name: nginx
           state: restarted
-        notify: restart gunicorn
 
   tasks:
 
@@ -103,9 +111,31 @@
       command: "pipenv --bare install"
       args:
         chdir: "{{ project_root }}"
-      when:
-        - ('No virtualenv' in pipenv_venv_check_cmd.stderr)
+      # when:
+      #   - ('No virtualenv' in pipenv_venv_check_cmd.stderr)
 
+    - name: Write application configuration file
+      template:
+        src: templates/app/config.py
+        dest: "{{ project_root }}/config.py"
+        owner: "{{ service_user }}"
+        group: "{{ service_group }}"
+        mode: u=r,g=r,o=r
+        backup: yes
+
+    - name: Create images directory if needed
+      file:
+        path: "{{ images_path }}"
+        mode: 0755
+        state: directory
+
+    - name: Create a web-accessible symlink to the images directory
+      file:
+        src: "{{ images_path }}"
+        dest: "{{ project_root }}/assets/images"
+        owner: "{{ service_user }}"
+        group: "{{ service_group }}"
+        state: link
 
     ########## Configure Nginx ##########
     # http://docs.gunicorn.org/en/latest/deploy.html
@@ -153,22 +183,25 @@
       template:
         src: templates/systemd/gunicorn.service.j2
         dest: /etc/systemd/system/gunicorn.service
-      notify: restart gunicorn
+      notify: restart gunicorn service
 
     - name: Configure the gunicorn socket
       template:
         src: templates/systemd/gunicorn.socket.j2
         dest: /etc/systemd/system/gunicorn.socket
-      notify: restart gunicorn
+      notify: restart gunicorn socket
 
     - name: Configure the gunicorn temporal file
       template:
         src: templates/systemd/gunicorn.conf.j2
         dest: /etc/tmpfiles.d/gunicorn.conf
-      notify: restart gunicorn
+      notify: restart gunicorn socket
 
-    - name: Start gunicorn service and enable at boot
+    - name: Start gunicorn and enable at boot
       systemd: 
-        name: gunicorn.socket
+        name: "{{ item }}"
         state: started
         enabled: yes
+      with_items:
+        - gunicorn.socket
+        - gunicorn.service
