@@ -108,7 +108,9 @@ app.layout = html.Div(children=[
                         # Date picker
                         dcc.DatePickerSingle(
                             id = 'date-select',
-                            date = dates_df['start'][0]
+                            date = dates_df['start'][0],
+                            min_date_allowed = dates_df['start'][0],
+                            max_date_allowed = dates_df['end'][0],
                         ),
                     ]
                 ),
@@ -119,9 +121,7 @@ app.layout = html.Div(children=[
 
             # Image
             html.Div(className="five columns", children=[
-                html.Img( id="img",
-                          src='/assets/image.png', 
-                          style={'maxWidth': '100%'})
+                html.Img( id="img", style={'maxWidth': '100%'})
             ])
         ]), # End image viewer row
 
@@ -173,7 +173,7 @@ def update_image(click_data):
     try:
         src = '/assets/images/{}'.format(click_data['points'][0]['text'])
     except:
-        src='/assets/image.png'
+        src = '/assets/images/{}'.format(dates_df['start'][0].strftime('output_%Y-%m-%d-%H-%M.png'))
     
     return src
 
@@ -205,7 +205,7 @@ def update_exp_graph(selected_date):
                     hovertemplate = '%{y}',
                     )],
             'layout': {
-                'title': "Traffic Explorer",
+                'title': "Daily Traffic Explorer",
                 'height': 300,
                 'margin': {'l': 30, 'b': 50, 'r': 30, 't': 30},
                 'xaxis': {
@@ -309,7 +309,7 @@ def update_avg_graph(start_date, end_date, selected_days):
 
             figure = {
                 'data': traces,
-                'layout': get_graph_layout("Average Daily Traffic")
+                'layout': get_graph_layout("Average Hourly Traffic")
             }
 
         except:
