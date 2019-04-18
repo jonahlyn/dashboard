@@ -207,11 +207,14 @@ def update_exp_graph(selected_date):
             'layout': {
                 'title': "Traffic Explorer",
                 'height': 300,
-                'margin': {'l': 15, 'b': 30, 'r': 15, 't': 30},
+                'margin': {'l': 30, 'b': 50, 'r': 30, 't': 30},
                 'xaxis': {
+                    'autorange': True,
                     'showgrid': False,
-                    'ticks': '',
-                    'showticklabels': False,
+                    'tickvals': df['date'][df['date'].dt.hour % 3 == 0][df['date'].dt.minute == 0][:-1],
+                    'ticktext': ['', '3am', '6', '9', 'noon', '3pm', '6', '9'],
+                    'zeroline': False,
+                    'showticklabels': True,
                     'zeroline': False,
                     'title': 'Hover and click to view images'
                     },
@@ -287,7 +290,7 @@ def update_avg_graph(start_date, end_date, selected_days):
                         # hoverinfo = 'text',
                         # text = dff.apply(get_hover_text, axis=1),
                         # fill='tonexty',
-                        # fill='tozeroy'
+                        fill='tozeroy'
                     ))
             else:
                 # If day is selected, show average of selected day
@@ -300,7 +303,7 @@ def update_avg_graph(start_date, end_date, selected_days):
                         # hoverinfo = 'text',
                         # text = tmp.apply(get_hover_text, axis=1),
                         # fill='tonexty',
-                        # fill='tozeroy'
+                        fill='tozeroy',
                         name=DAYS_OF_WEEK[day]
                     ))
 
