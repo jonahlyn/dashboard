@@ -16,13 +16,6 @@ sudo apt update && sudo apt -y install python python-pip python3 python3-pip
 sudo -H pip3 install pipenv --system
 ```
 
-Python can be weird, so if that doesn't work try this:
-
-```
-sudo -H python3 -m pip install pipenv
-```
-
-Either way, you need to end up with `/usr/local/bin/pipenv`.
 
 ## Installation and Deployment with Ansible
 
