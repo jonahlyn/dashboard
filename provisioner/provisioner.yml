@@ -32,14 +32,14 @@
           name: gunicorn.socket
           state: restarted
           daemon_reload: yes
-        notify: restart gunicorn service
+        notify: restart nginx
 
       - name: restart gunicorn service
         systemd:
           name: gunicorn
           state: restarted
           daemon_reload: yes
-        notify: restart nginx
+        notify: restart gunicorn socket
 
       - name: restart nginx
         systemd:
@@ -93,6 +93,7 @@
         dest: "{{ project_root }}"
         owner: "{{ service_user }}"
         group: "{{ service_group }}"
+      notify: restart gunicorn service
 
     - name: Check if a virtualenv is already created
       environment:
