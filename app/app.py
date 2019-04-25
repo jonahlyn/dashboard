@@ -212,7 +212,7 @@ def update_exp_graph(selected_date):
                     'autorange': True,
                     'showgrid': False,
                     'tickvals': df['date'][df['date'].dt.hour % 3 == 0][df['date'].dt.minute == 0][:-1],
-                    'ticktext': ['', '3am', '6', '9', 'noon', '3pm', '6', '9'],
+                    'ticktext': ['', '3am', '6', '9', 'noon', '3pm', '6', '9', ''],
                     'zeroline': False,
                     'showticklabels': True,
                     'zeroline': False,
@@ -275,6 +275,9 @@ def update_avg_graph(start_date, end_date, selected_days):
             # Query the database
             query = "SELECT date, vehicles FROM data where date between '{}' and '{}'".format(start_date, end_date)
             df = pd.read_sql(query, conn)
+            
+            df = df.groupby(pd.Grouper(key='date', freq='5min')).sum()
+            df = df.reset_index() #.dropna()
             df['interval'] = df['date'].dt.strftime('%H%M').astype('int64')
 
             traces = []
