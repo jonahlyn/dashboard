@@ -136,7 +136,7 @@ app.layout = html.Div(children=[
                     min_date_allowed = dates_df['start'][0],
                     max_date_allowed = dates_df['end'][0],
                     # initial_visible_month = dates_df['end'][0],
-                    start_date = dates_df['start'][0],
+                    start_date = dates_df['end'][0] - timedelta(days=60),
                     end_date = dates_df['end'][0],
                     start_date_placeholder_text='Start Date',
                     end_date_placeholder_text='End Date'
