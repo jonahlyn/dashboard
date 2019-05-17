@@ -2,6 +2,9 @@
 ![alt text](screenshot.png "Traffic Dashboard Screenshot")
 
 
+Model training and data acquisition by Laurence Mirabal. Code can be found at [https://github.com/lmirabal8689/rgc](https://github.com/lmirabal8689/rgc)
+
+
 ## Getting Started
 
 Requirements:
