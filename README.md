@@ -1,4 +1,5 @@
 # Traffic Dashboard
+![alt text](screenshot.png "Traffic Dashboard Screenshot")
 
 
 ## Getting Started
